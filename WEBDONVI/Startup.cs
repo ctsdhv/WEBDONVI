@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace WEBDONVI
 {
@@ -24,6 +25,18 @@ namespace WEBDONVI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cfg =>
+            {
+                cfg.LoginPath = "";
+                cfg.LogoutPath = "";
+                cfg.AccessDeniedPath = "/";
+                cfg.Cookie.Name = "token";
+                cfg.Cookie.MaxAge = TimeSpan.FromMinutes(240);
+            });
+            services.AddSession(cfg =>
+            {
+                cfg.Cookie.Name = "Session";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +57,9 @@ namespace WEBDONVI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
